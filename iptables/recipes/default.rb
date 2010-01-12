@@ -33,5 +33,16 @@ remote_file "/usr/sbin/rebuild-iptables" do
   mode 0755
 end
 
+template "/etc/init.d/iptables" do
+  source "init.sh.erb"
+  owner "root"
+  group "root"
+  mode 0755
+end
+service "iptables" do
+  supports :start => true, :restart => true
+  action [ :enable ]
+end
+
 iptables_rule "all_established"
 iptables_rule "all_icmp"

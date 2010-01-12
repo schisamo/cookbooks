@@ -1,0 +1,49 @@
+#!/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+NAME=iptables
+DESC=iptables
+
+IPTABLES=/sbin/iptables
+REBUILD_IPTABLES=/usr/sbin/rebuild-iptables
+
+test -x $IPTABLES || exit 0
+test -x $REBUILD_IPTABLES || exit 0
+
+. /lib/lsb/init-functions
+
+start() {
+  $REBUILD_IPTABLES
+}
+stop() {
+  $IPTABLES -F
+}
+
+case "$1" in
+  start)
+	log_daemon_msg "Rebuilding the iptables rules"
+    start
+	log_end_msg 0
+    ;;
+  stop)
+	log_daemon_msg "Flushing the iptables rules"
+	stop
+	log_end_msg 0
+	;;
+  reload|restart|force-reload)
+	log_daemon_msg "Flushing then rebuilding the iptables rules"
+    stop
+	start
+	log_end_msg 0
+    ;;
+  status)
+    /sbin/iptables -L
+    /sbin/iptables -t nat -L
+    ;;
+  *)
+	N=/etc/init.d/$NAME
+	echo "Usage: $N {start|stop|restart|reload|force-reload}" >&2
+    exit 1
+	;;
+esac
+
+exit 0
