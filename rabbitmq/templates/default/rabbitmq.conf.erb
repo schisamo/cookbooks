@@ -7,6 +7,6 @@ NODE_IP_ADDRESS=<%= node[:rabbitmq][:address] %>
 NODE_PORT=<%= node[:rabbitmq][:port] %>
 SERVER_ERL_ARGS=<%= node[:rabbitmq][:erl_args] %>
 CLUSTER_CONFIG_FILE=<%= node[:rabbitmq][:cluster_config] %>
-LOG_BASE=<%= node[:rabbitmq][:logdir] %>
-MNESIA_BASE=<%= node[:rabbitmq][:mnesiadir] %>
+LOG_BASE=<%= node[:rabbitmq][:log_dir] %>
+MNESIA_BASE=<%= node[:rabbitmq][:mnesia_dir] %>
 SERVER_START_ARGS=<%= node[:rabbitmq][:start_args] %>

@@ -26,8 +26,8 @@ service "rabbitmq-server" do
   action [ :enable, :start ]
 end
 
-template "/etc/rabbitmq/rabbitmq.config" do
-  source "rabbitmq.config.erb"
+template "#{node[:rabbitmq][:conf_dir]}/rabbitmq.conf" do
+  source "rabbitmq.conf.erb"
   owner "root"
   group "root"
   mode 0644

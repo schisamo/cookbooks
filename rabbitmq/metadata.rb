@@ -1,14 +1,16 @@
-maintainer        "Benjamin Black"
-maintainer_email  "b@b3k.us"
+maintainer        "Opscode, Inc."
+maintainer_email  "cookbooks@opscode.com"
 license           "Apache 2.0"
 description       "Installs and configures RabbitMQ server"
 version           "0.2.2"
 recipe            "rabbitmq", "Install and configure RabbitMQ"
 recipe            "rabbitmq::cluster", "Set up RabbitMQ clustering."
 
-%w{ubuntu debian}.each do |os|
+%w{ubuntu debian centos redhat fedora suse}.each do |os|
   supports os
 end
+
+depends "openssl"
 
 attribute "rabbitmq",
   :display_name => "RabbitMQ",

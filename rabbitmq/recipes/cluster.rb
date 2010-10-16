@@ -3,6 +3,7 @@
 # Recipe:: cluster
 #
 # Copyright 2009, Benjamin Black
+# Copyright 2010, Opscode, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,18 +19,31 @@
 #
 include_recipe "rabbitmq::default"
 
-template "/var/lib/rabbitmq/.erlang.cookie" do
+# find other rabbitmq nodes to cluster with
+rabbitmq_servers = search(:node, %Q{recipes:"rabbitmq::cluster"}) || node
+# we cluster by hostname to stop annoying Erlang "System NOT running to use fully qualified hostnames" errors
+# you may need to update your /etc/hosts file with shortname => ip mappings
+node[:rabbitmq][:cluster_disk_nodes] = rabbitmq_servers.map{|n| "#{n[:rabbitmq][:nodename]}@#{n[:hostname]}"}.sort
+
+# write a shared erlang cookie
+template "#{node[:rabbitmq][:state_dir]}/.erlang.cookie" do
   source "doterlang.cookie.erb"
   owner "rabbitmq"
   group "rabbitmq"
   mode 0400
 end
 
-template "/etc/rabbitmq/rabbitmq_cluster.config" do
+# delete the mnesia directory to force a reset
+directory node[:rabbitmq][:mnesia_dir] do
+  action :nothing
+  recursive true
+  notifies :restart, resources(:service => "rabbitmq-server")
+end
+
+template "#{node[:rabbitmq][:conf_dir]}/rabbitmq_cluster.config" do
   source "rabbitmq_cluster.config.erb"
   owner "root"
   group "root"
   mode 0644
-  notifies :restart, resources(:service => "rabbitmq-server")
+  notifies :delete, resources(:directory => node[:rabbitmq][:mnesia_dir]), :immediately
 end
-
