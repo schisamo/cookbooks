@@ -48,6 +48,7 @@ template "/etc/cloudkick.conf" do
     :node_name => node.name,
     :cloudkick_tags => node.run_list.roles
   })
+  notifies :restart, "service[cloudkick-agent]"
 end
 
 package "cloudkick-agent" do
@@ -56,7 +57,6 @@ end
 
 service "cloudkick-agent" do
   action [ :enable, :start ]
-  subscribes :restart, resources(:template => "/etc/cloudkick.conf")
 end
 
 gem_package "cloudkick" do
